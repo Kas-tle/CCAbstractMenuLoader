@@ -1,0 +1,16 @@
+[versions]
+abstract-menus = "1.14"
+jackson = "2.15.2"
+lombok = "8.0.1"
+paper-api = "1.20.1-R0.1-SNAPSHOT"
+shadow = "8.1.1"
+
+[libraries]
+abstract-menus = { group = "com.github.AbstractMenus", name = "api", version.ref = "abstract-menus" }
+jackson-databind = { group = "com.fasterxml.jackson.core", name = "jackson-databind", version.ref = "jackson" }
+paper-api = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper-api" }
+shadow = { group = "com.github.johnrengelman", name = "shadow", version.ref = "shadow" }
+
+[plugins]
+lombok = { id = "io.freefair.lombok", version.ref = "lombok" }
+shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow" }

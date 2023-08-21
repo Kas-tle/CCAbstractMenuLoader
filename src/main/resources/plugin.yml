@@ -1,0 +1,7 @@
+name: ${name}
+version: ${version}
+website: ${url}
+authors: [${authors}]
+main: dev.kastle.ccabstractmenuloader.CCAbstractMenuLoader
+api-version: '${paperApiVersion}'
+depend: [AbstractMenus]
