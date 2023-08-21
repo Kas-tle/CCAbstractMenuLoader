@@ -21,15 +21,28 @@ jobs:
         BRANCH: ${{ github.ref_name }}
       run: | 
         PREVIOUS_TAG=$(git for-each-ref --sort=-version:refname --count 1 --format="%(refname:short)" "refs/tags/${BRANCH}*")
-        echo tag=${PREVIOUS_TAG} >> $GITHUB_OUTPUT
+        if [[ -z "$PREVIOUS_TAG" ]]; then
+        # Default build number to 1 if there was no previous tag.
+        echo "BUILD_NUMBER=1" >> $GITHUB_ENV
+        else
+        echo tag=${PREVIOUS_TAG} >> $GITHUB_ENV
+        fi
     - name: Get current build number
       id: getCurrentBuild
       env:
         PREVIOUS_TAG: ${{ steps.getPreviousBuild.outputs.tag }}
         BRANCH: ${{ github.ref_name }}
-      run: | 
-        echo tag=${BRANCH}-$((10#${PREVIOUS_TAG##*-}+1)) >> $GITHUB_OUTPUT
-        echo number=$((10#${PREVIOUS_TAG##*-}+1)) >> $GITHUB_OUTPUT
+      run: |
+        if [[ -z "$PREVIOUS_TAG" ]]; then
+        # If PREVIOUS_TAG is empty, we have already set the build number to 1 in the previous step.
+        echo "Current build number is 1"
+        else
+        # Extracting the build number from the tag and incrementing by 1.
+        PREVIOUS_BUILD_NUMBER=$(echo $PREVIOUS_TAG | sed "s/${BRANCH}-build-//")
+        CURRENT_BUILD_NUMBER=$((PREVIOUS_BUILD_NUMBER + 1))
+        echo "Current build number is $CURRENT_BUILD_NUMBER"
+        echo "BUILD_NUMBER=$CURRENT_BUILD_NUMBER" >> $GITHUB_ENV
+        fi
     - name: Bump version and push tag
       id: tag_version
       uses: mathieudutour/github-tag-action@v6.1
