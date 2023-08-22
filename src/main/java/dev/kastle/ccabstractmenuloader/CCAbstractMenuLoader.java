@@ -15,14 +15,19 @@ public class CCAbstractMenuLoader extends JavaPlugin {
 
     @Override
     public void onLoad() {
-        this.logger = new PaperLogger(getLogger());
+        try {
+            this.logger = new PaperLogger(getLogger());
+            this.pocketBaseFetcher = new PocketBaseFetcher(this);
+            new TypesRegistrar(this).registerTypes();
+        } catch  (Exception e) {
+            this.logger.error("Failed to load CCAbstractMenuLoader", e);
+        }
     }
 
     @Override
     public void onEnable() {
         try {
-            this.pocketBaseFetcher = new PocketBaseFetcher(this);
-            new TypesRegistrar(this).registerTypes();
+            this.logger.info("Enabled CCAbstractMenuLoader");
         } catch (Exception e) {
             this.logger.error("Failed to enable CCAbstractMenuLoader", e);
         }
