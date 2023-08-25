@@ -17,8 +17,16 @@ public class PocketBaseFetcher {
 
     public JsonNode getPocketBaseJson(String endpoint) {
         try {
-
-            URL url = new URL("https://pocketbase.coastersandcrafters.com/api/collections/" + endpoint + "/records?expand=community&fields=community,id,location,phase,expand&perPage=1000&filter=phase%20%3D%20%27finished%27");
+            URL url = null;
+            
+            if (endpoint == "con_shops") {
+                url = new URL("https://pocketbase.coastersandcrafters.com/api/collections/con_shops/records?expand=community&fields=community,id,expand&perPage=1000");
+            } else if (endpoint == "con_booths") {
+                url = new URL("https://pocketbase.coastersandcrafters.com/api/collections/con_booths/records?expand=community&fields=community,id,location,expand&perPage=1000&filter=phase%20%3D%20%27finished%27");
+            } else if (endpoint == "con_worlds") {
+                url = new URL("https://pocketbase.coastersandcrafters.com/api/collections/con_worlds/records?expand=community&fields=community,id,expand&perPage=1000");
+            }
+            
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
             connection.connect();
