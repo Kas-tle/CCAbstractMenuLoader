@@ -68,6 +68,8 @@ public class TypesRegistrar {
             communityIdMap.put(communityIdList.get(i), i + 1);
         }
 
+        plugin.logger().info(communityIdMap.asText());
+
         plugin.logger().info("Initialized community ID map with " + communityIdMap.size() + " entries");
     }
 
