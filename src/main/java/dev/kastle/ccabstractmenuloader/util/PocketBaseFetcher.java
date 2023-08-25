@@ -18,7 +18,7 @@ public class PocketBaseFetcher {
     public JsonNode getPocketBaseJson(String endpoint) {
         try {
 
-            URL url = new URL("https://pocketbase.coastersandcrafters.com/api/collections/" + endpoint + "/records?expand=community&fields=community,id,location,expand&perPage=1000&filter=phase%20%3D%20'finished'");
+            URL url = new URL("https://pocketbase.coastersandcrafters.com/api/collections/" + endpoint + "/records?expand=community&fields=community,id,location,phase,expand&perPage=1000&filter=phase%20%3D%20%27finished%27");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
             connection.connect();
