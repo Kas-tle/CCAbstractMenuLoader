@@ -12,5 +12,6 @@ public class ConShop {
     private String community;
     private String communityName;
     private String id;
+    private String location;
     private int customModelData;
 }

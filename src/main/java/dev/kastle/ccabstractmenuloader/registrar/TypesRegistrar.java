@@ -24,8 +24,12 @@ public class TypesRegistrar {
     private CCAbstractMenuLoader plugin;
     private PocketBaseFetcher pocketBaseFetcher;
     private JsonNode conBoothsJson;
-    private JsonNode conShopsJson;
-    private JsonNode conWorldsJson;
+    // private JsonNode conShopsJson;    
+    private JsonNode conBoothMapJson;
+    // private JsonNode conShopsMapJson;
+
+
+    // private JsonNode conWorldsJson;
     private Map<String, Integer> communityIdMap = new HashMap<>();
 
     public TypesRegistrar(CCAbstractMenuLoader plugin) {
@@ -37,29 +41,31 @@ public class TypesRegistrar {
         initJson();
         initCommunityIdMap();
         Types.registerCatalog("con_booth", ConBoothCatalog.class, new ConBoothCatalog.Serializer(conBooths()));
-        Types.registerCatalog("con_shop", ConShopCatalog.class, new ConShopCatalog.Serializer(conShops()));
-        Types.registerCatalog("con_world", ConWorldCatalog.class, new ConWorldCatalog.Serializer(conWorlds()));
+        // Types.registerCatalog("con_shop", ConShopCatalog.class, new ConShopCatalog.Serializer(conShops()));
+        // Types.registerCatalog("con_world", ConWorldCatalog.class, new ConWorldCatalog.Serializer(conWorlds()));
         plugin.logger().info("Registered abstract menu types");
     }
 
     private void initJson() {
         conBoothsJson = pocketBaseFetcher.getPocketBaseJson("con_booths");
-        conShopsJson = pocketBaseFetcher.getPocketBaseJson("con_shops");
-        conWorldsJson = pocketBaseFetcher.getPocketBaseJson("con_worlds");
+        conBoothMapJson = pocketBaseFetcher.getPocketBaseJson("con_booth_map");
+        // conShopsJson = pocketBaseFetcher.getPocketBaseJson("con_shops");
+        // conShopsMapJson = pocketBaseFetcher.getPocketBaseJson("con_shop_map");
+        // conWorldsJson = pocketBaseFetcher.getPocketBaseJson("con_worlds");        
     }
 
     private void initCommunityIdMap() {
         Set<String> communityIds = new HashSet<>();
 
-        conShopsJson.get("items").forEach(conShop -> {
-            communityIds.add(conShop.get("community").asText());
-        });
+        // conShopsJson.get("items").forEach(conShop -> {
+        //     communityIds.add(conShop.get("community").asText());
+        // });
         conBoothsJson.get("items").forEach(conBooth -> {
             communityIds.add(conBooth.get("community").asText());
         });
-        conWorldsJson.get("items").forEach(conWorld -> {
-            communityIds.add(conWorld.get("community").asText());
-        });
+        // conWorldsJson.get("items").forEach(conWorld -> {
+        //     communityIds.add(conWorld.get("community").asText());
+        // });
 
         List<String> communityIdList = new ArrayList<>(communityIds);
         Collections.sort(communityIdList);
@@ -68,8 +74,6 @@ public class TypesRegistrar {
             communityIdMap.put(communityIdList.get(i), i + 1);
         }
 
-        plugin.logger().info(communityIdMap.asText());
-
         plugin.logger().info("Initialized community ID map with " + communityIdMap.size() + " entries");
     }
 
@@ -77,10 +81,12 @@ public class TypesRegistrar {
         Collection<ConBooth> conBooths = new ArrayList<>();
 
         conBoothsJson.get("items").forEach(conBooth -> {
+            JsonNode map = findBoothMap(conBooth.get("id").asText());
+            
             conBooths.add(new ConBooth(
                     conBooth.get("community").asText(),
                     conBooth.get("expand").get("community").get("name").asText(),
-                    conBooth.get("location").asText(),
+                    map != null ? map.get("id").asText() : "",
                     conBooth.get("id").asText(),
                     communityIdMap.get(conBooth.get("community").asText())
             ));
@@ -89,33 +95,66 @@ public class TypesRegistrar {
         return conBooths;
     }
 
-    private Collection<ConShop> conShops() {
-        Collection<ConShop> conShops = new ArrayList<>();
+    private JsonNode findBoothMap(String booth) {
+        JsonNode node = null;
+        for (JsonNode conMap : conBoothMapJson.get("items")) {
+            if (conMap.get("booth") == null) continue;
+            if (conMap.get("booth").asText() == "") continue;
 
-        conShopsJson.get("items").forEach(conShop -> {
-            conShops.add(new ConShop(
-                    conShop.get("community").asText(),
-                    conShop.get("expand").get("community").get("name").asText(),
-                    conShop.get("id").asText(),
-                    communityIdMap.get(conShop.get("community").asText())
-            ));
-        });
+            if (conMap.get("booth").asText().equals(booth)) {
+                node = conMap;
+                break;
+            }
+        }
 
-        return conShops;
+        return node;
     }
 
-    private Collection<ConWorld> conWorlds() {
-        Collection<ConWorld> conWorlds = new ArrayList<>();
+    // private Collection<ConShop> conShops() {
+    //     Collection<ConShop> conShops = new ArrayList<>();
 
-        conWorldsJson.get("items").forEach(conWorld -> {
-            conWorlds.add(new ConWorld(
-                    conWorld.get("community").asText(),
-                    conWorld.get("expand").get("community").get("name").asText(),
-                    conWorld.get("id").asText(),
-                    communityIdMap.get(conWorld.get("community").asText())
-            ));
-        });
+    //     conShopsJson.get("items").forEach(conShop -> {
+    //         JsonNode map = findShopMap(conShop.get("id").asText());
 
-        return conWorlds;
-    }
+    //         conShops.add(new ConShop(
+    //                 conShop.get("community").asText(),
+    //                 conShop.get("expand").get("community").get("name").asText(),
+    //                 conShop.get("id").asText(),
+    //                 map != null ? map.get("id").asText() : "",
+    //                 communityIdMap.get(conShop.get("community").asText())
+    //         ));
+    //     });
+
+    //     return conShops;
+    // }
+
+    // private JsonNode findShopMap(String shop) {
+    //     JsonNode node = null;
+    //     for (JsonNode conMap : conShopsMapJson.get("items")) {
+    //         if (conMap.get("shop") == null) continue;
+    //         if (conMap.get("shop").asText() == "") continue;
+
+    //         if (conMap.get("shop").asText().equals(shop)) {
+    //             node = conMap;
+    //             break;
+    //         }
+    //     }
+
+    //     return node;
+    // }
+
+    // private Collection<ConWorld> conWorlds() {
+    //     Collection<ConWorld> conWorlds = new ArrayList<>();
+
+    //     conWorldsJson.get("items").forEach(conWorld -> {
+    //         conWorlds.add(new ConWorld(
+    //                 conWorld.get("community").asText(),
+    //                 conWorld.get("expand").get("community").get("name").asText(),
+    //                 conWorld.get("id").asText(),
+    //                 communityIdMap.get(conWorld.get("community").asText())
+    //         ));
+    //     });
+
+    //     return conWorlds;
+    // }
 }

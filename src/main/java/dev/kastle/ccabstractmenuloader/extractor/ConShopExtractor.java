@@ -12,6 +12,7 @@ public class ConShopExtractor implements ValueExtractor {
                 case "community" -> { return conShop.community(); }
                 case "community_name" -> { return conShop.communityName(); }
                 case "id" -> { return conShop.id(); }
+                case "location" -> { return conShop.location(); }
                 case "custom_model_data" -> { return String.valueOf(conShop.customModelData()); }
             }
         }
